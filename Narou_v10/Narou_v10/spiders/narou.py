@@ -24,10 +24,10 @@ class NarouSpider(scrapy.Spider):
             request.meta['item'] = item
             yield request
         next_page = response.css('div.pager a::attr(href)').getall()[-1]
-        # if int(next_page.split('=')[-1]) < 15001:
-        #     request = scrapy.Request(response.urljoin(next_page), self.parse)
-        #     request.meta['item'] = item
-        #     yield request
+        if int(next_page.split('=')[-1]) < 15001:
+            request = scrapy.Request(response.urljoin(next_page), self.parse)
+            request.meta['item'] = item
+            yield request
 
     def parse_page(self, response):
         item = response.meta['item']
@@ -71,7 +71,6 @@ class NarouSpider(scrapy.Spider):
         text = texts.replace('\u3000', '').replace('\n', '')
         return text
 
-
     def extract_discourse(self, text):
         self.pattern = '「(.*?)」'
         rexp = re.compile(self.pattern)
@@ -82,10 +81,10 @@ class NarouSpider(scrapy.Spider):
 
     def write_text(self, texts, code):
         if os.path.exists('./{}.txt'.format(code)):
-            with open('./{}.txt'.format(code), 'a') as file:
+            with open('./NarouModernRenaiDataset./{}.txt'.format(code), 'a') as file:
                 file.write('\n'.join(texts) + '\n')
         else:
-            with open('./{}.txt'.format(code), 'w') as file:
+            with open('./NarouModernRenaiDataset/{}.txt'.format(code), 'w') as file:
                 file.write('\n'.join(texts) + '\n')
 
     def extract_code(self, url):
